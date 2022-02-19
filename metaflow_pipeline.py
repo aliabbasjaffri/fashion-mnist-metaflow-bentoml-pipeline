@@ -1,6 +1,6 @@
 from metaflow import FlowSpec, step
 
-from train import __train__, test_model
+from train import train, test
 
 
 class ExperimentalPyTorchFlow(FlowSpec):
@@ -12,12 +12,12 @@ class ExperimentalPyTorchFlow(FlowSpec):
 
     @step
     def model_train(self):
-        self.model = __train__(epochs=self.epochs)
+        self.model = train(num_epochs=self.epochs)
         self.next(self.model_test)
 
     @step
     def model_test(self):
-        self.outputs = test_model(self.model)
+        self.outputs = test(self.model)
         self.next(self.end)
 
     @step

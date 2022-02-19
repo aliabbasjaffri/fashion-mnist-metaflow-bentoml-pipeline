@@ -114,76 +114,16 @@ def test(model: FashionMNISTConvnet) -> dict:
                 class_correct[label] += c[i].item()
                 total_correct[label] += 1
 
+    test_results = {}
     for i in range(10):
         print("Accuracy of {}: {:.2f}%".format(output_label(i), class_correct[i] * 100 / total_correct[i]))
+        test_results[output_label(i)] = class_correct[i] * 100 / total_correct[i]
 
     print((sum(class_correct) * 100) / sum(total_correct))
 
-
-def train_epoch(
-    model, optimizer, loss_function, train_loader, epoch, _device="cpu"
-) -> None:
-    # Mark training flag
-    model.train()
-    for batch_idx, (inputs, targets) in enumerate(train_loader):
-        inputs, targets = inputs.to(_device), targets.to(_device)
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = loss_function(outputs, targets)
-        loss.backward()
-        optimizer.step()
-        if batch_idx % 499 == 0:
-            print(
-                "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                    epoch,
-                    batch_idx * len(inputs),
-                    len(train_loader.dataset),
-                    100.0 * batch_idx / len(train_loader),
-                    loss.item(),
-                )
-            )
-
-
-def __train__(
-    epochs: int = 1, learning_rate: float = 1e-4, _device: str = "cpu"
-) -> FashionMNISTConvnet:
-    train_loader = get_loader(is_train_set=True)
-
-    model = FashionMNISTConvnet()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    loss_function = nn.CrossEntropyLoss()
-    for epoch in range(epochs):
-        train_epoch(model, optimizer, loss_function, train_loader, epoch, _device)
-
-    # mlflow.pytorch.log_model(model, "model")
-    return model
-
-
-def test_model(
-    model: FashionMNISTConvnet, _test_loader: DataLoader = None, _device: str = "cpu"
-) -> dict:
-    _correct, _total = 0, 0
-
-    if _test_loader is None:
-        _test_loader = get_loader(is_train_set=False)
-
-    model.eval()
-    with torch.no_grad():
-        for batch_idx, (inputs, targets) in enumerate(_test_loader):
-            inputs, targets = inputs.to(_device), targets.to(_device)
-            outputs = model(inputs)
-            _, predicted = torch.max(outputs.data, 1)
-            _total += targets.size(0)
-            _correct += (predicted == targets).sum().item()
-
-    # mlflow.log_metric("val_accuracy", (float(_correct) / _total) * 100)
-    print((float(_correct) / _total) * 100)
-    return {"correct": _correct, "total": _total}
+    return test_results
 
 
 if __name__ == "__main__":
-    # model = train()
-    # test(model=model)
-    model = __train__(epochs=5)
-    test_model(model)
-
+    model = train()
+    test(model=model)
