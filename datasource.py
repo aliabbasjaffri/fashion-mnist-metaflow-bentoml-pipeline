@@ -11,25 +11,30 @@ seed = 42
 random.seed(seed)
 np.random.seed(seed)
 
+FASHION_MNIST_CLASSES = [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot",
+]
+
 
 def _dataloader_init_fn():
     np.random.seed(seed)
 
 
 def output_label(label):
-    output_mapping = {
-                 0: "T-shirt/Top",
-                 1: "Trouser",
-                 2: "Pullover",
-                 3: "Dress",
-                 4: "Coat",
-                 5: "Sandal",
-                 6: "Shirt",
-                 7: "Sneaker",
-                 8: "Bag",
-                 9: "Ankle Boot"
-                 }
-    _value = (label.item() if type(label) == torch.Tensor else label)
+    output_mapping = {}
+    for i, value in enumerate(FASHION_MNIST_CLASSES):
+        output_mapping[i] = value
+
+    _value = label.item() if type(label) == torch.Tensor else label
     return output_mapping[_value]
 
 
@@ -37,8 +42,9 @@ def get_fashion_mnist_dataset(is_train_dataset: bool = True) -> FashionMNIST:
     """
     Prepare Fashion MNIST dataset
     """
-    _transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5,), (0.5,))])
+    _transform = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
+    )
     return FashionMNIST(
         os.getcwd(),
         download=True,
@@ -56,9 +62,7 @@ def get_loader(is_train_set: bool = True) -> DataLoader:
     _batch_size = 100
     _shuffle_data = True
     return _get_loader(
-        dataset=_dataset,
-        batch_size=_batch_size,
-        shuffle_data=_shuffle_data
+        dataset=_dataset, batch_size=_batch_size, shuffle_data=_shuffle_data
     )
 
 
