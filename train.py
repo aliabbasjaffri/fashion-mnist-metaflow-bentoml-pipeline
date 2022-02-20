@@ -1,6 +1,4 @@
 from torch import torch, nn
-from torch.utils.data import DataLoader
-
 from datasource import get_loader, output_label
 from model import FashionMNISTConvnet
 from torch.autograd import Variable
@@ -77,7 +75,11 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
                 accuracy_list.append(accuracy)
 
             if not (count % 50):
-                print("Iteration: {}, Loss: {}, Accuracy: {}%".format(count, loss.data, accuracy))
+                print(
+                    "Iteration: {}, Loss: {}, Accuracy: {}%".format(
+                        count, loss.data, accuracy
+                    )
+                )
 
     plt.plot(iteration_list, loss_list)
     plt.xlabel("No. of Iteration")
@@ -96,8 +98,8 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
 
 def test(model: FashionMNISTConvnet) -> dict:
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    class_correct = [0. for _ in range(10)]
-    total_correct = [0. for _ in range(10)]
+    class_correct = [0.0 for _ in range(10)]
+    total_correct = [0.0 for _ in range(10)]
 
     test_loader = get_loader(is_train_set=False)
 
@@ -116,7 +118,11 @@ def test(model: FashionMNISTConvnet) -> dict:
 
     test_results = {}
     for i in range(10):
-        print("Accuracy of {}: {:.2f}%".format(output_label(i), class_correct[i] * 100 / total_correct[i]))
+        print(
+            "Accuracy of {}: {:.2f}%".format(
+                output_label(i), class_correct[i] * 100 / total_correct[i]
+            )
+        )
         test_results[output_label(i)] = class_correct[i] * 100 / total_correct[i]
 
     print((sum(class_correct) * 100) / sum(total_correct))
