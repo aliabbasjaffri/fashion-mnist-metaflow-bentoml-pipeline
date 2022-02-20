@@ -4,3 +4,6 @@ metaflow==2.5.2
 black==22.1.0
 numpy==1.20.3
 matplotlib
+scikit-learn==1.0.2
+bentoml>=1.0.0a
+Pillow==9.0.1
