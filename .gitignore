@@ -132,3 +132,4 @@ dmypy.json
 .metaflow/
 FashionMNIST/
 mlruns/
+.DS_Store
