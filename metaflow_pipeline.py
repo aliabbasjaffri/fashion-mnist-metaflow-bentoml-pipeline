@@ -1,8 +1,7 @@
+import bentoml
+import mlflow
 from metaflow import FlowSpec, step
 from train import train, test
-
-# from bento_deployment import FashionMNISTClassifier
-import bentoml
 
 
 class FashionMNISTFlow(FlowSpec):
@@ -14,13 +13,14 @@ class FashionMNISTFlow(FlowSpec):
 
     @step
     def start(self):
-        self.epochs = 1
+        self.epochs = 5
         self.next(self.model_train)
 
     # @resources(memory=8196, cpu=8)
     @step
     def model_train(self):
         self.model = train(num_epochs=self.epochs)
+        mlflow.pytorch.log_model(self.model, "fashion_mnist_classifier")
         self.next(self.model_test)
 
     @step
@@ -43,4 +43,5 @@ class FashionMNISTFlow(FlowSpec):
 
 
 if __name__ == "__main__":
+    mlflow.set_experiment("fashion-mnist-classifier")
     obj = FashionMNISTFlow()

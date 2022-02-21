@@ -7,3 +7,4 @@ matplotlib
 scikit-learn==1.0.2
 bentoml>=1.0.0a
 Pillow==9.0.1
+mlflow==1.23.1

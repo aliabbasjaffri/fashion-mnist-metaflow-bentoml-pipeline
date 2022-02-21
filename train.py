@@ -1,3 +1,4 @@
+import mlflow
 from torch import torch, nn
 from datasource import get_loader, output_label
 from model import FashionMNISTConvnet
@@ -18,6 +19,7 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
     print(model)
 
     count = 0
+    batch_size: int = 100
 
     # Lists for visualization of loss and accuracy
     loss_list = []
@@ -28,6 +30,10 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
     predictions_list = []
     labels_list = []
 
+    mlflow.log_params({"epochs": num_epochs})
+    mlflow.log_params({"learning_rate": learning_rate})
+    mlflow.log_params({"batch_size": learning_rate})
+
     train_loader = get_loader(is_train_set=True)
     test_loader = get_loader(is_train_set=False)
 
@@ -36,7 +42,7 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
             # Transfering images and labels to GPU if available
             _images, _labels = images.to(device), labels.to(device)
 
-            train_images = Variable(_images.view(100, 1, 28, 28))
+            train_images = Variable(_images.view(batch_size, 1, 28, 28))
             train_labels = Variable(_labels)
 
             # Forward pass
@@ -60,7 +66,7 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
                     _images, _labels = __images.to(device), __labels.to(device)
                     labels_list.append(_labels)
 
-                    test_images = Variable(images.view(100, 1, 28, 28))
+                    test_images = Variable(images.view(batch_size, 1, 28, 28))
                     outputs = model(test_images)
 
                     predictions = torch.max(outputs, 1)[1].to(device)
@@ -124,6 +130,10 @@ def test(model: FashionMNISTConvnet) -> dict:
             )
         )
         test_results[output_label(i)] = class_correct[i] * 100 / total_correct[i]
+        mlflow.log_metric(
+            f"validation_accuracy_{output_label(i)}",
+            class_correct[i] * 100 / total_correct[i],
+        )
 
     print((sum(class_correct) * 100) / sum(total_correct))
 
