@@ -32,7 +32,7 @@ def train(num_epochs: int = 1, learning_rate: float = 0.001) -> FashionMNISTConv
 
     mlflow.log_params({"epochs": num_epochs})
     mlflow.log_params({"learning_rate": learning_rate})
-    mlflow.log_params({"batch_size": learning_rate})
+    mlflow.log_params({"batch_size": batch_size})
 
     train_loader = get_loader(is_train_set=True)
     test_loader = get_loader(is_train_set=False)
